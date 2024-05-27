@@ -1,0 +1,23 @@
+{
+    "name": "manic-miners-map-renderer",
+    "version": "1.0.0",
+    "main": "dist/index.js",
+    "scripts": {
+        "resetdist": "rimraf dist",
+        "build": "tsc",
+        "start": "tsc && ts-node dist/index.js"
+    },
+    "author": "Waleed Judah",
+    "license": "MIT",
+    "description": "A tool for generating PNG images of 2D map tiles for the game Manic Miners. Converts tile arrays into visually appealing images with custom biome colors and patterns.",
+    "dependencies": {
+        "canvas": "^2.11.2",
+        "chardet": "^2.0.0",
+        "dotenv": "^16.4.5"
+    },
+    "devDependencies": {
+        "@types/chardet": "^0.8.3",
+        "@types/dotenv": "^8.2.0",
+        "@types/node": "^20.12.12"
+    }
+}
