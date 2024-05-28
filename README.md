@@ -7,8 +7,6 @@ Manic Miners Map Renderer is a tool designed to generate PNG images of 2D map ti
 ## Features
 
 -   Converts 2D tile arrays into PNG images.
--   Applies a brushstroke effect to the generated images.
--   Supports custom biome colors.
 -   Generates both full-sized screenshots and thumbnails.
 -   Processes entire directories of map files.
 

@@ -80,7 +80,9 @@ export const generateMapImage = async ({
     screenshotFileName,
     thumbnailFileName,
     progressCallback,
-}: GenerateMapImageParams & { progressCallback?: (progress: { processedCount: number; totalCount: number }) => void }): Promise<GenerateMapImageResult> => {
+}: GenerateMapImageParams & {
+    progressCallback?: (progress: { processedCount: number; totalCount: number }) => void;
+}): Promise<GenerateMapImageResult> => {
     const resolvedDirectoryPath = directoryPath || process.env.MMT_CATALOG_DIR;
     if (!resolvedDirectoryPath) {
         const message = 'MMT_CATALOG_DIR is not defined in .env.local and no directory path was provided.';
@@ -95,7 +97,12 @@ export const generateMapImage = async ({
     }
 
     try {
-        const { updateNeeded, results: processingResults, processedCount, totalCount } = await processDirectory(resolvedDirectoryPath, type, progressCallback, screenshotFileName, thumbnailFileName);
+        const {
+            updateNeeded,
+            results: processingResults,
+            processedCount,
+            totalCount,
+        } = await processDirectory(resolvedDirectoryPath, type, progressCallback, screenshotFileName, thumbnailFileName);
         const errors = processingResults.filter(result => !result.status);
         const errorCount = errors.length;
 
