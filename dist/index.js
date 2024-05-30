@@ -108,7 +108,7 @@ const generateMapImage = (_a) => __awaiter(void 0, [_a], void 0, function* ({ ty
         };
     }
     try {
-        const { updateNeeded, results: processingResults, processedCount, totalCount } = yield processDirectory(resolvedDirectoryPath, type, progressCallback, screenshotFileName, thumbnailFileName);
+        const { updateNeeded, results: processingResults, processedCount, totalCount, } = yield processDirectory(resolvedDirectoryPath, type, progressCallback, screenshotFileName, thumbnailFileName);
         const errors = processingResults.filter(result => !result.status);
         const errorCount = errors.length;
         const message = errorCount > 0 ? `Processing completed with ${errorCount} errors.` : 'Processing completed successfully.';
