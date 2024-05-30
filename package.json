@@ -1,7 +1,8 @@
 {
     "name": "manic-miners-map-renderer",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "main": "dist/index.js",
+    "types": "dist/index.d.ts",
     "scripts": {
         "resetdist": "rimraf dist",
         "build": "tsc",
