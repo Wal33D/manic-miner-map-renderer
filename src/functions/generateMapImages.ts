@@ -5,7 +5,7 @@ import { generateThumbnailImage } from './generateThumbnailImage';
 
 dotenv.config({ path: '.env.local' });
 
-interface ImageGenerationResult {
+export interface ImageGenerationResult {
     screenshotPath: string;
     thumbnailPath: string;
     screenshotExists: boolean;
