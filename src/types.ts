@@ -38,6 +38,7 @@ export interface GenerateMapImageResult {
     updateNeeded: boolean;
     errorDetails?: GenerateImageResult[];
     message: string;
+    results?:any;
 }
 
 export type GenerateMapImageParams = {
