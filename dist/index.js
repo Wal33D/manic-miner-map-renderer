@@ -35,12 +35,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateMapImage = void 0;
+exports.generateMapImage = exports.generateMapImages = void 0;
 const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
 const dotenv = __importStar(require("dotenv"));
 const generatePNGImage_1 = require("./src/functions/generatePNGImage");
 const generateThumbnailImage_1 = require("./src/functions/generateThumbnailImage");
+var generateMapImages_1 = require("./src/functions/generateMapImages");
+Object.defineProperty(exports, "generateMapImages", { enumerable: true, get: function () { return generateMapImages_1.generateMapImages; } });
 dotenv.config({ path: '.env.local' });
 const findDatFiles = (dir) => __awaiter(void 0, void 0, void 0, function* () {
     const results = [];
