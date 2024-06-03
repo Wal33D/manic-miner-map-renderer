@@ -5,7 +5,7 @@ import { generatePNGImage } from './src/functions/generatePNGImage';
 import { generateThumbnailImage } from './src/functions/generateThumbnailImage';
 import { GenerateImageResult, GenerateMapImageParams, GenerateMapImageResult, ProcessDirectoryResult } from './src/types';
 export { GenerateImageResult, GenerateMapImageResult } from './src/types';
-
+export {generateMapImages} from './src/functions/generateMapImages';
 dotenv.config({ path: '.env.local' });
 
 const findDatFiles = async (dir: string): Promise<string[]> => {
