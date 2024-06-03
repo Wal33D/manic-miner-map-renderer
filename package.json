@@ -14,7 +14,9 @@
     "dependencies": {
         "canvas": "^2.11.2",
         "chardet": "^2.0.0",
-        "dotenv": "^16.4.5"
+        "cloudinary": "^2.2.0",
+        "dotenv": "^16.4.5",
+        "mongodb": "^6.7.0"
     },
     "devDependencies": {
         "@types/chardet": "^0.8.3",
