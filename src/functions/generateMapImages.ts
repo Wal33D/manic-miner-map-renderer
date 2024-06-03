@@ -3,17 +3,17 @@ import * as dotenv from 'dotenv';
 import { generatePNGImage } from './generatePNGImage';
 import { generateThumbnailImage } from './generateThumbnailImage';
 
-
 dotenv.config({ path: '.env.local' });
 
-export const generateMapImages = async (datFilePath: string): Promise<{}> => {
+interface ImageGenerationResult {
+    screenshotPath: string;
+    thumbnailPath: string;
+}
+
+export const generateMapImages = async (datFilePath: string): Promise<ImageGenerationResult> => {
     const fileDirectoryName = path.basename(path.dirname(datFilePath));
-    const results: { thumbnailCreated: boolean; screenshotCreated: boolean; thumbnailPath: string; screenshotPath: string } = {
-        thumbnailCreated: false,
-        screenshotCreated: false,
-        thumbnailPath: '',
-        screenshotPath: ''
-    };
+    let screenshotPath = '';
+    let thumbnailPath = '';
 
     // Generate PNG screenshot
     const generatedScreenshotFileName = `${fileDirectoryName}_screenshot_render.png`;
@@ -23,8 +23,7 @@ export const generateMapImages = async (datFilePath: string): Promise<{}> => {
     });
 
     if (pngResult.imageCreated) {
-        results.screenshotCreated = true;
-        results.screenshotPath = path.resolve(pngResult.filePath);
+        screenshotPath = path.resolve(pngResult.filePath);
     }
 
     // Generate Thumbnail image
@@ -35,16 +34,11 @@ export const generateMapImages = async (datFilePath: string): Promise<{}> => {
     });
 
     if (thumbnailResult.imageCreated) {
-        results.thumbnailCreated = true;
-        results.thumbnailPath = path.resolve(thumbnailResult.filePath);
+        thumbnailPath = path.resolve(thumbnailResult.filePath);
     }
 
     return {
-        updateNeeded: results.thumbnailCreated || results.screenshotCreated,
-        processedCount: Number(results.thumbnailCreated) + Number(results.screenshotCreated),
-        totalCount: 2, // One for thumbnail and one for screenshot
-        errors: !(results.thumbnailCreated && results.screenshotCreated),
-        message: 'Image generation completed',
-        results
+        screenshotPath,
+        thumbnailPath,
     };
 };
