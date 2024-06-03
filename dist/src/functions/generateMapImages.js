@@ -45,6 +45,8 @@ const generateMapImages = (datFilePath) => __awaiter(void 0, void 0, void 0, fun
     const fileDirectoryName = path_1.default.basename(path_1.default.dirname(datFilePath));
     let screenshotPath = '';
     let thumbnailPath = '';
+    let screenshotExists = false;
+    let thumbnailExists = false;
     // Generate PNG screenshot
     const generatedScreenshotFileName = `${fileDirectoryName}_screenshot_render.png`;
     const pngResult = yield (0, generatePNGImage_1.generatePNGImage)({
@@ -53,6 +55,7 @@ const generateMapImages = (datFilePath) => __awaiter(void 0, void 0, void 0, fun
     });
     if (pngResult.imageCreated) {
         screenshotPath = path_1.default.resolve(pngResult.filePath);
+        screenshotExists = true;
     }
     // Generate Thumbnail image
     const generatedThumbnailFileName = `${fileDirectoryName}_thumbnail_render.png`;
@@ -62,10 +65,13 @@ const generateMapImages = (datFilePath) => __awaiter(void 0, void 0, void 0, fun
     });
     if (thumbnailResult.imageCreated) {
         thumbnailPath = path_1.default.resolve(thumbnailResult.filePath);
+        thumbnailExists = true;
     }
     return {
         screenshotPath,
         thumbnailPath,
+        screenshotExists,
+        thumbnailExists,
     };
 });
 exports.generateMapImages = generateMapImages;

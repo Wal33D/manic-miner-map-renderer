@@ -8,12 +8,16 @@ dotenv.config({ path: '.env.local' });
 interface ImageGenerationResult {
     screenshotPath: string;
     thumbnailPath: string;
+    screenshotExists: boolean;
+    thumbnailExists: boolean;
 }
 
 export const generateMapImages = async (datFilePath: string): Promise<ImageGenerationResult> => {
     const fileDirectoryName = path.basename(path.dirname(datFilePath));
     let screenshotPath = '';
     let thumbnailPath = '';
+    let screenshotExists = false;
+    let thumbnailExists = false;
 
     // Generate PNG screenshot
     const generatedScreenshotFileName = `${fileDirectoryName}_screenshot_render.png`;
@@ -24,6 +28,7 @@ export const generateMapImages = async (datFilePath: string): Promise<ImageGener
 
     if (pngResult.imageCreated) {
         screenshotPath = path.resolve(pngResult.filePath);
+        screenshotExists = true;
     }
 
     // Generate Thumbnail image
@@ -35,10 +40,13 @@ export const generateMapImages = async (datFilePath: string): Promise<ImageGener
 
     if (thumbnailResult.imageCreated) {
         thumbnailPath = path.resolve(thumbnailResult.filePath);
+        thumbnailExists = true;
     }
 
     return {
         screenshotPath,
         thumbnailPath,
+        screenshotExists,
+        thumbnailExists,
     };
 };
