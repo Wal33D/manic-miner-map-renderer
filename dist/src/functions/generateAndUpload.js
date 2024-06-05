@@ -35,59 +35,52 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateMapImages = void 0;
+exports.generateAndUpload = void 0;
 const path_1 = __importDefault(require("path"));
 const dotenv = __importStar(require("dotenv"));
+const cloudinary_1 = require("cloudinary");
 const generatePNGImage_1 = require("./generatePNGImage");
 const generateThumbnailImage_1 = require("./generateThumbnailImage");
 dotenv.config({ path: '.env.local' });
-const generateMapImages = (datFilePath) => __awaiter(void 0, void 0, void 0, function* () {
-    const imageDestinationPath = path_1.default.dirname(datFilePath);
+cloudinary_1.v2.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+const uploadToCloudinary = (filePath, folder) => __awaiter(void 0, void 0, void 0, function* () {
+    const fileName = path_1.default.basename(filePath, path_1.default.extname(filePath));
+    const result = yield cloudinary_1.v2.uploader.upload(filePath, {
+        folder,
+        public_id: fileName,
+    });
+    return result.secure_url;
+});
+const generateAndUpload = (datFilePath) => __awaiter(void 0, void 0, void 0, function* () {
     const fileDirectoryName = path_1.default.basename(path_1.default.dirname(datFilePath));
-    let screenshotPath = '';
-    let thumbnailPath = '';
-    let screenshotExists = false;
-    let thumbnailExists = false;
-    let screenshotCreated = false;
-    let thumbnailCreated = false;
-    // Generate PNG screenshot
     const generatedScreenshotFileName = `${fileDirectoryName}_screenshot_render.png`;
-    const pngResult = yield (0, generatePNGImage_1.generatePNGImage)({
-        filePath: datFilePath,
-        outputFileName: generatedScreenshotFileName,
-    });
-    if (pngResult.imageCreated) {
-        screenshotPath = path_1.default.resolve(pngResult.filePath);
-        screenshotCreated = true;
-        screenshotExists = true;
-    }
-    else {
-        screenshotPath = path_1.default.resolve(imageDestinationPath, generatedScreenshotFileName);
-        screenshotExists = true;
-    }
-    // Generate Thumbnail image
     const generatedThumbnailFileName = `${fileDirectoryName}_thumbnail_render.png`;
-    const thumbnailResult = yield (0, generateThumbnailImage_1.generateThumbnailImage)({
-        filePath: datFilePath,
-        outputFileName: generatedThumbnailFileName,
-    });
-    if (thumbnailResult.imageCreated) {
-        thumbnailPath = path_1.default.resolve(thumbnailResult.filePath);
-        thumbnailExists = true;
-        thumbnailCreated = true;
-    }
-    else {
-        thumbnailPath = path_1.default.resolve(imageDestinationPath, generatedThumbnailFileName);
-        thumbnailExists = true;
-    }
+    // Generate PNG screenshot and Thumbnail image concurrently
+    const [pngResult, thumbnailResult] = yield Promise.all([
+        (0, generatePNGImage_1.generatePNGImage)({
+            filePath: datFilePath,
+            outputFileName: generatedScreenshotFileName,
+        }),
+        (0, generateThumbnailImage_1.generateThumbnailImage)({
+            filePath: datFilePath,
+            outputFileName: generatedThumbnailFileName,
+        }),
+    ]);
+    // Upload PNG screenshot and Thumbnail image concurrently
+    const [screenshotUrl, thumbnailUrl] = yield Promise.all([
+        pngResult.imageCreated ? uploadToCloudinary(pngResult.filePath, process.env.CATALOG_NAME) : Promise.resolve(''),
+        thumbnailResult.imageCreated ? uploadToCloudinary(thumbnailResult.filePath, process.env.CATALOG_NAME) : Promise.resolve(''),
+    ]);
     return {
-        screenshotPath,
-        thumbnailPath,
-        screenshotExists,
-        thumbnailExists,
-        thumbnailCreated,
-        screenshotCreated,
+        screenshotUrl,
+        thumbnailUrl,
+        screenshotExists: !!screenshotUrl,
+        thumbnailExists: !!thumbnailUrl,
     };
 });
-exports.generateMapImages = generateMapImages;
-//# sourceMappingURL=generateMapImages.js.map
+exports.generateAndUpload = generateAndUpload;
+//# sourceMappingURL=generateAndUpload.js.map

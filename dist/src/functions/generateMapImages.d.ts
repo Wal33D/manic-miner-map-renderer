@@ -1,8 +1,9 @@
-interface ImageGenerationResult {
-    screenshotPath: string;
-    thumbnailPath: string;
-    screenshotExists: boolean;
+export interface ImageGenerationResult {
     thumbnailExists: boolean;
+    screenshotExists: boolean;
+    thumbnailCreated: boolean;
+    screenshotCreated: boolean;
+    thumbnailPath: string;
+    screenshotPath: string;
 }
 export declare const generateMapImages: (datFilePath: string) => Promise<ImageGenerationResult>;
-export {};

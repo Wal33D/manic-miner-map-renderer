@@ -6,18 +6,24 @@ import { generateThumbnailImage } from './generateThumbnailImage';
 dotenv.config({ path: '.env.local' });
 
 export interface ImageGenerationResult {
-    screenshotPath: string;
-    thumbnailPath: string;
-    screenshotExists: boolean;
     thumbnailExists: boolean;
+    screenshotExists: boolean;
+    thumbnailCreated: boolean;
+    screenshotCreated: boolean;
+    thumbnailPath: string;
+    screenshotPath: string;
 }
 
 export const generateMapImages = async (datFilePath: string): Promise<ImageGenerationResult> => {
+    const imageDestinationPath = path.dirname(datFilePath);
+
     const fileDirectoryName = path.basename(path.dirname(datFilePath));
     let screenshotPath = '';
     let thumbnailPath = '';
     let screenshotExists = false;
     let thumbnailExists = false;
+    let screenshotCreated = false;
+    let thumbnailCreated = false;
 
     // Generate PNG screenshot
     const generatedScreenshotFileName = `${fileDirectoryName}_screenshot_render.png`;
@@ -28,6 +34,10 @@ export const generateMapImages = async (datFilePath: string): Promise<ImageGener
 
     if (pngResult.imageCreated) {
         screenshotPath = path.resolve(pngResult.filePath);
+        screenshotCreated = true;
+        screenshotExists = true;
+    } else {
+        screenshotPath = path.resolve(imageDestinationPath, generatedScreenshotFileName);
         screenshotExists = true;
     }
 
@@ -41,6 +51,10 @@ export const generateMapImages = async (datFilePath: string): Promise<ImageGener
     if (thumbnailResult.imageCreated) {
         thumbnailPath = path.resolve(thumbnailResult.filePath);
         thumbnailExists = true;
+        thumbnailCreated = true;
+    } else {
+        thumbnailPath = path.resolve(imageDestinationPath, generatedThumbnailFileName);
+        thumbnailExists = true;
     }
 
     return {
@@ -48,5 +62,7 @@ export const generateMapImages = async (datFilePath: string): Promise<ImageGener
         thumbnailPath,
         screenshotExists,
         thumbnailExists,
+        thumbnailCreated,
+        screenshotCreated,
     };
 };
