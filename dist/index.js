@@ -1,27 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,17 +12,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateMapImage = exports.generateAndUpload = exports.generateMapImages = void 0;
+exports.generateMapImage = exports.generateAndUploadStream = exports.generateAndUpload = exports.generateThumbnailBuffer = exports.generateMapImages = exports.generatePngBuffer = void 0;
 const promises_1 = __importDefault(require("fs/promises"));
 const path_1 = __importDefault(require("path"));
-const dotenv = __importStar(require("dotenv"));
 const generatePNGImage_1 = require("./src/functions/generatePNGImage");
-const generateThumbnailImage_1 = require("./src/functions/generateThumbnailImage");
+var generatePngBuffer_1 = require("./src/functions/generatePngBuffer");
+Object.defineProperty(exports, "generatePngBuffer", { enumerable: true, get: function () { return generatePngBuffer_1.generatePngBuffer; } });
 var generateMapImages_1 = require("./src/functions/generateMapImages");
 Object.defineProperty(exports, "generateMapImages", { enumerable: true, get: function () { return generateMapImages_1.generateMapImages; } });
+const generateThumbnailImage_1 = require("./src/functions/generateThumbnailImage");
+var generateThumbnailBuffer_1 = require("./src/functions/generateThumbnailBuffer");
+Object.defineProperty(exports, "generateThumbnailBuffer", { enumerable: true, get: function () { return generateThumbnailBuffer_1.generateThumbnailBuffer; } });
 var generateAndUpload_1 = require("./src/functions/generateAndUpload");
 Object.defineProperty(exports, "generateAndUpload", { enumerable: true, get: function () { return generateAndUpload_1.generateAndUpload; } });
-dotenv.config({ path: '.env.local' });
+var generateAndUploadStream_1 = require("./src/functions/generateAndUploadStream");
+Object.defineProperty(exports, "generateAndUploadStream", { enumerable: true, get: function () { return generateAndUploadStream_1.generateAndUploadStream; } });
 const findDatFiles = (dir) => __awaiter(void 0, void 0, void 0, function* () {
     const results = [];
     const entries = yield promises_1.default.readdir(dir, { withFileTypes: true });

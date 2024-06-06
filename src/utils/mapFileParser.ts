@@ -1,17 +1,22 @@
 import fs from 'fs';
 import iconv from 'iconv-lite';
 import chardet from 'chardet';
-import { ParsedMapData } from '../types';
+import { ParseMapDataParams, ParsedMapData } from '../types';
 
-export function parseMapDataFromFile({ filePath }: { filePath: string }): Promise<ParsedMapData> {
-    return new Promise((resolve, reject) => {
-        const encoding = chardet.detectFileSync(filePath) || 'utf8';
+export function parseMapData({ filePath, buffer }: ParseMapDataParams): Promise<ParsedMapData> {
+    return new Promise(async (resolve, reject) => {
+        try {
+            let data: Buffer;
+            let encoding: string;
 
-        fs.readFile(filePath, (err, data) => {
-            if (err) {
-                console.error('Failed to read file', err);
-                reject(err);
-                return;
+            if (filePath) {
+                encoding = chardet.detectFileSync(filePath) || 'utf8';
+                data = await fs.promises.readFile(filePath);
+            } else if (buffer) {
+                encoding = chardet.detect(buffer) || 'utf8';
+                data = buffer;
+            } else {
+                throw new Error('Either filePath or buffer must be provided');
             }
 
             const levelFileData = iconv.decode(data, encoding);
@@ -50,15 +55,16 @@ export function parseMapDataFromFile({ filePath }: { filePath: string }): Promis
                         .filter(n => n.trim() !== '')
                         .map(n => parseInt(n, 10))
                         .filter(n => !isNaN(n));
-                    if (currentKey === 'tiles') {
-                        parsedData.tilesArray = parsedData.tilesArray.concat(numbers);
-                    }
+                    parsedData.tilesArray = parsedData.tilesArray.concat(numbers);
                 }
             });
 
             parsedData.size = parsedData.rowcount * parsedData.colcount;
 
             resolve(parsedData);
-        });
+        } catch (err) {
+            console.error('Failed to read file or buffer', err);
+            reject(err);
+        }
     });
 }

@@ -35,55 +35,39 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generatePNGImage = void 0;
-const promises_1 = __importDefault(require("fs/promises"));
-const path_1 = __importDefault(require("path"));
+exports.generatePngBuffer = void 0;
 const sharp_1 = __importDefault(require("sharp"));
 const dotenv = __importStar(require("dotenv"));
 const colorMap_1 = require("../utils/colorMap");
 const mapFileParser_1 = require("../utils/mapFileParser");
 const canvas_1 = require("canvas");
 dotenv.config({ path: '.env.local' });
-const generatePNGImage = (_a) => __awaiter(void 0, [_a], void 0, function* ({ filePath, outputFileName = 'screenshot_render.png', }) {
-    const outputDir = path_1.default.dirname(filePath);
-    const screenshotFilePath = path_1.default.join(outputDir, outputFileName);
-    let fileAccessed = false;
+const generatePngBuffer = (_a) => __awaiter(void 0, [_a], void 0, function* ({ filePath, buffer }) {
     let parseDataSuccess = false;
     let wallArrayGenerated = false;
     let imageBufferCreated = false;
-    let fileSaved = false;
     let imageCreated = false;
     const errorDetails = {};
     let imageBuffer;
     try {
-        yield promises_1.default.access(screenshotFilePath);
-        fileAccessed = true;
-    }
-    catch (accessError) {
-        if (accessError.code !== 'ENOENT') {
-            errorDetails.accessError = accessError.message;
-        }
-    }
-    try {
-        if (!fileAccessed) {
-            const parsedData = yield (0, mapFileParser_1.parseMapData)({ filePath });
-            parseDataSuccess = true;
-            const wallArray = create2DArray(parsedData.tilesArray, parsedData.colcount);
-            wallArrayGenerated = true;
-            imageBuffer = yield createPNGImageBuffer(wallArray, parsedData.biome);
-            imageBufferCreated = true;
-            yield (0, sharp_1.default)(imageBuffer).toFile(screenshotFilePath);
-            fileSaved = true;
-            imageCreated = true;
-        }
+        const parsedData = filePath
+            ? yield (0, mapFileParser_1.parseMapData)({ filePath })
+            : buffer
+                ? yield (0, mapFileParser_1.parseMapData)({ buffer })
+                : (() => {
+                    throw new Error('Either filePath or buffer must be provided');
+                })();
+        parseDataSuccess = true;
+        const wallArray = create2DArray(parsedData.tilesArray, parsedData.colcount);
+        wallArrayGenerated = true;
+        imageBuffer = yield createPNGImageBuffer(wallArray, parsedData.biome);
+        imageBufferCreated = true;
+        imageCreated = true;
         return {
             status: true,
-            filePath: screenshotFilePath,
-            fileAccessed,
             parseDataSuccess,
             wallArrayGenerated,
             imageBufferCreated,
-            fileSaved,
             imageCreated,
             imageBuffer,
         };
@@ -99,22 +83,19 @@ const generatePNGImage = (_a) => __awaiter(void 0, [_a], void 0, function* ({ fi
             errorDetails.saveError = error.message;
         return {
             status: false,
-            filePath: screenshotFilePath,
-            fileAccessed,
             parseDataSuccess,
             wallArrayGenerated,
             imageBufferCreated,
-            fileSaved,
             imageCreated,
             errorDetails,
         };
     }
 });
-exports.generatePNGImage = generatePNGImage;
+exports.generatePngBuffer = generatePngBuffer;
 const createPNGImageBuffer = (wallArray_1, ...args_1) => __awaiter(void 0, [wallArray_1, ...args_1], void 0, function* (wallArray, biome = 'default') {
     const scale = 20;
-    let height = wallArray.length;
-    let width = wallArray[0].length;
+    const height = wallArray.length;
+    const width = wallArray[0].length;
     const borderTiles = 2;
     const canvasWidth = (width + borderTiles * 2) * scale;
     const canvasHeight = (height + borderTiles * 2) * scale;
@@ -206,4 +187,4 @@ const create2DArray = (data, width) => {
     }
     return result;
 };
-//# sourceMappingURL=generatePNGImage.js.map
+//# sourceMappingURL=generatePngBuffer.js.map

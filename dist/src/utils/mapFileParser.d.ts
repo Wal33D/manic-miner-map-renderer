@@ -1,4 +1,2 @@
-import { ParsedMapData } from '../types';
-export declare function parseMapDataFromFile({ filePath }: {
-    filePath: string;
-}): Promise<ParsedMapData>;
+import { ParseMapDataParams, ParsedMapData } from '../types';
+export declare function parseMapData({ filePath, buffer }: ParseMapDataParams): Promise<ParsedMapData>;

@@ -15,12 +15,12 @@ export interface ParsedMapData {
 
 export interface GenerateImageResult {
     status: boolean;
-    filePath: string;
-    fileAccessed: boolean;
+    filePath?: string;
+    fileAccessed?: boolean;
     parseDataSuccess: boolean;
     wallArrayGenerated: boolean;
     imageBufferCreated: boolean;
-    fileSaved: boolean;
+    fileSaved?: boolean;
     imageCreated: boolean;
     errorDetails?: {
         accessError?: string;
@@ -38,7 +38,7 @@ export interface GenerateMapImageResult {
     updateNeeded: boolean;
     errorDetails?: GenerateImageResult[];
     message: string;
-    results?:any;
+    results?: any;
 }
 
 export type GenerateMapImageParams = {
@@ -53,4 +53,8 @@ export interface ProcessDirectoryResult {
     processedCount: number;
     totalCount: number;
     updateNeeded: boolean;
+}
+export interface ParseMapDataParams {
+    filePath?: string;
+    buffer?: Buffer;
 }

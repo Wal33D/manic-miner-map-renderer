@@ -1,20 +1,36 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.parseMapDataFromFile = void 0;
+exports.parseMapData = void 0;
 const fs_1 = __importDefault(require("fs"));
 const iconv_lite_1 = __importDefault(require("iconv-lite"));
 const chardet_1 = __importDefault(require("chardet"));
-function parseMapDataFromFile({ filePath }) {
-    return new Promise((resolve, reject) => {
-        const encoding = chardet_1.default.detectFileSync(filePath) || 'utf8';
-        fs_1.default.readFile(filePath, (err, data) => {
-            if (err) {
-                console.error('Failed to read file', err);
-                reject(err);
-                return;
+function parseMapData({ filePath, buffer }) {
+    return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
+        try {
+            let data;
+            let encoding;
+            if (filePath) {
+                encoding = chardet_1.default.detectFileSync(filePath) || 'utf8';
+                data = yield fs_1.default.promises.readFile(filePath);
+            }
+            else if (buffer) {
+                encoding = chardet_1.default.detect(buffer) || 'utf8';
+                data = buffer;
+            }
+            else {
+                throw new Error('Either filePath or buffer must be provided');
             }
             const levelFileData = iconv_lite_1.default.decode(data, encoding);
             const parsedData = {
@@ -53,15 +69,17 @@ function parseMapDataFromFile({ filePath }) {
                         .filter(n => n.trim() !== '')
                         .map(n => parseInt(n, 10))
                         .filter(n => !isNaN(n));
-                    if (currentKey === 'tiles') {
-                        parsedData.tilesArray = parsedData.tilesArray.concat(numbers);
-                    }
+                    parsedData.tilesArray = parsedData.tilesArray.concat(numbers);
                 }
             });
             parsedData.size = parsedData.rowcount * parsedData.colcount;
             resolve(parsedData);
-        });
-    });
+        }
+        catch (err) {
+            console.error('Failed to read file or buffer', err);
+            reject(err);
+        }
+    }));
 }
-exports.parseMapDataFromFile = parseMapDataFromFile;
+exports.parseMapData = parseMapData;
 //# sourceMappingURL=mapFileParser.js.map

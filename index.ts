@@ -1,14 +1,14 @@
 import fs from 'fs/promises';
 import path from 'path';
-import * as dotenv from 'dotenv';
 import { generatePNGImage } from './src/functions/generatePNGImage';
-import { generateThumbnailImage } from './src/functions/generateThumbnailImage';
-import { GenerateImageResult, GenerateMapImageParams, GenerateMapImageResult, ProcessDirectoryResult } from './src/types';
-export { GenerateImageResult, GenerateMapImageResult } from './src/types';
+export { generatePngBuffer } from './src/functions/generatePngBuffer';
 export { generateMapImages } from './src/functions/generateMapImages';
+import { generateThumbnailImage } from './src/functions/generateThumbnailImage';
+export { generateThumbnailBuffer } from './src/functions/generateThumbnailBuffer';
+export { GenerateImageResult, GenerateMapImageResult } from './src/types';
 export { generateAndUpload, ImageGenerationUploadResult } from './src/functions/generateAndUpload';
-
-dotenv.config({ path: '.env.local' });
+export { generateAndUploadStream, ImageGenerationStreamResult } from './src/functions/generateAndUploadStream';
+import { GenerateImageResult, GenerateMapImageParams, GenerateMapImageResult, ProcessDirectoryResult } from './src/types';
 
 const findDatFiles = async (dir: string): Promise<string[]> => {
     const results: string[] = [];

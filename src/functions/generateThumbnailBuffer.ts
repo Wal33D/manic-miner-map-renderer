@@ -1,55 +1,37 @@
-import fs from 'fs/promises';
-import path from 'path';
 import sharp from 'sharp';
 import * as dotenv from 'dotenv';
 import { colors } from '../utils/colorMap';
 import { parseMapData } from '../utils/mapFileParser';
-import { Color, GenerateImageResult } from '../types';
+import { GenerateImageResult } from '../types';
 import { createCanvas, CanvasRenderingContext2D } from 'canvas';
 
 dotenv.config({ path: '.env.local' });
 
-export const generateThumbnailImage = async ({
-    filePath,
-    outputFileName = 'thumbnail_render.png',
-}: {
-    filePath: string;
-    outputFileName?: string;
-}): Promise<GenerateImageResult> => {
+export const generateThumbnailBuffer = async ({ filePath, buffer }: { filePath?: string; buffer?: Buffer }): Promise<GenerateImageResult> => {
     let status = false;
-    const outputDir = path.dirname(filePath);
-    const thumbnailPath = path.join(outputDir, outputFileName);
 
-    let fileAccessed = false;
     let parseDataSuccess = false;
     let wallArrayGenerated = false;
     let imageBufferCreated = false;
-    let fileSaved = false;
     let imageCreated = false;
     const errorDetails: GenerateImageResult['errorDetails'] = {};
     let imageBuffer: Buffer | undefined;
 
     try {
-        await fs.access(thumbnailPath);
-        fileAccessed = true;
-    } catch (accessError) {
-        if ((accessError as NodeJS.ErrnoException).code !== 'ENOENT') {
-            errorDetails.accessError = (accessError as Error).message;
-        }
-    }
+        const parsedData = filePath
+            ? await parseMapData({ filePath })
+            : buffer
+            ? await parseMapData({ buffer })
+            : (() => {
+                  throw new Error('Either filePath or buffer must be provided');
+              })();
 
-    try {
-        if (!fileAccessed) {
-            const parsedData = await parseMapData({ filePath });
-            parseDataSuccess = true;
-            const wallArray = create2DArray(parsedData.tilesArray, parsedData.colcount);
-            wallArrayGenerated = true;
-            imageBuffer = await createThumbnailBuffer(wallArray);
-            imageBufferCreated = true;
-            await sharp(imageBuffer).toFile(thumbnailPath);
-            fileSaved = true;
-            imageCreated = true;
-        }
+        parseDataSuccess = true;
+        const wallArray = create2DArray(parsedData.tilesArray, parsedData.colcount);
+        wallArrayGenerated = true;
+        imageBuffer = await createThumbnailBuffer(wallArray);
+        imageBufferCreated = true;
+        imageCreated = true;
         status = true;
     } catch (error: any) {
         if (!parseDataSuccess) errorDetails.parseError = error.message;
@@ -60,22 +42,19 @@ export const generateThumbnailImage = async ({
 
     return {
         status,
-        filePath: thumbnailPath,
-        fileAccessed,
         parseDataSuccess,
         wallArrayGenerated,
         imageBuffer,
         imageBufferCreated,
-        fileSaved,
         imageCreated,
         errorDetails,
     };
 };
 
-const createThumbnailBuffer = async (wallArray: number[][]) => {
+const createThumbnailBuffer = async (wallArray: number[][]): Promise<Buffer> => {
     const scale = 10;
-    let height = wallArray.length;
-    let width = wallArray[0].length;
+    const height = wallArray.length;
+    const width = wallArray[0].length;
 
     const canvas = createCanvas(width * scale, height * scale);
     const ctx = canvas.getContext('2d');

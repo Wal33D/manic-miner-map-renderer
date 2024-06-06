@@ -35,48 +35,35 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.generateThumbnailImage = void 0;
-const promises_1 = __importDefault(require("fs/promises"));
-const path_1 = __importDefault(require("path"));
+exports.generateThumbnailBuffer = void 0;
 const sharp_1 = __importDefault(require("sharp"));
 const dotenv = __importStar(require("dotenv"));
 const colorMap_1 = require("../utils/colorMap");
 const mapFileParser_1 = require("../utils/mapFileParser");
 const canvas_1 = require("canvas");
 dotenv.config({ path: '.env.local' });
-const generateThumbnailImage = (_a) => __awaiter(void 0, [_a], void 0, function* ({ filePath, outputFileName = 'thumbnail_render.png', }) {
+const generateThumbnailBuffer = (_a) => __awaiter(void 0, [_a], void 0, function* ({ filePath, buffer }) {
     let status = false;
-    const outputDir = path_1.default.dirname(filePath);
-    const thumbnailPath = path_1.default.join(outputDir, outputFileName);
-    let fileAccessed = false;
     let parseDataSuccess = false;
     let wallArrayGenerated = false;
     let imageBufferCreated = false;
-    let fileSaved = false;
     let imageCreated = false;
     const errorDetails = {};
     let imageBuffer;
     try {
-        yield promises_1.default.access(thumbnailPath);
-        fileAccessed = true;
-    }
-    catch (accessError) {
-        if (accessError.code !== 'ENOENT') {
-            errorDetails.accessError = accessError.message;
-        }
-    }
-    try {
-        if (!fileAccessed) {
-            const parsedData = yield (0, mapFileParser_1.parseMapData)({ filePath });
-            parseDataSuccess = true;
-            const wallArray = create2DArray(parsedData.tilesArray, parsedData.colcount);
-            wallArrayGenerated = true;
-            imageBuffer = yield createThumbnailBuffer(wallArray);
-            imageBufferCreated = true;
-            yield (0, sharp_1.default)(imageBuffer).toFile(thumbnailPath);
-            fileSaved = true;
-            imageCreated = true;
-        }
+        const parsedData = filePath
+            ? yield (0, mapFileParser_1.parseMapData)({ filePath })
+            : buffer
+                ? yield (0, mapFileParser_1.parseMapData)({ buffer })
+                : (() => {
+                    throw new Error('Either filePath or buffer must be provided');
+                })();
+        parseDataSuccess = true;
+        const wallArray = create2DArray(parsedData.tilesArray, parsedData.colcount);
+        wallArrayGenerated = true;
+        imageBuffer = yield createThumbnailBuffer(wallArray);
+        imageBufferCreated = true;
+        imageCreated = true;
         status = true;
     }
     catch (error) {
@@ -91,22 +78,19 @@ const generateThumbnailImage = (_a) => __awaiter(void 0, [_a], void 0, function*
     }
     return {
         status,
-        filePath: thumbnailPath,
-        fileAccessed,
         parseDataSuccess,
         wallArrayGenerated,
         imageBuffer,
         imageBufferCreated,
-        fileSaved,
         imageCreated,
         errorDetails,
     };
 });
-exports.generateThumbnailImage = generateThumbnailImage;
+exports.generateThumbnailBuffer = generateThumbnailBuffer;
 const createThumbnailBuffer = (wallArray) => __awaiter(void 0, void 0, void 0, function* () {
     const scale = 10;
-    let height = wallArray.length;
-    let width = wallArray[0].length;
+    const height = wallArray.length;
+    const width = wallArray[0].length;
     const canvas = (0, canvas_1.createCanvas)(width * scale, height * scale);
     const ctx = canvas.getContext('2d');
     yield renderThumbnailTiles(ctx, wallArray, scale);
@@ -152,4 +136,4 @@ const create2DArray = (data, width) => {
     }
     return result;
 };
-//# sourceMappingURL=generateThumbnailImage.js.map
+//# sourceMappingURL=generateThumbnailBuffer.js.map
