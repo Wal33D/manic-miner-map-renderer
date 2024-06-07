@@ -5,4 +5,4 @@ export interface ImageGenerationStreamResult {
     thumbnailUrl: string;
     screenshotUrl: string;
 }
-export declare const generateAndUploadStream: (datFileBuffer: Buffer, datFileName: string) => Promise<ImageGenerationStreamResult>;
+export declare const generateAndUploadStream: (datFileBuffer: Buffer, datFileName: string, cloudinaryAssetFolder: string) => Promise<ImageGenerationStreamResult>;

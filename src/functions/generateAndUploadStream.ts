@@ -3,7 +3,7 @@ import * as dotenv from 'dotenv';
 import { v2 as cloudinary } from 'cloudinary';
 import { generatePngBuffer } from './generatePngBuffer';
 import { generateThumbnailBuffer } from './generateThumbnailBuffer';
-
+//Handles All Functionality in Memory for the Serverless World out there!
 dotenv.config({ path: '.env.local' });
 
 export interface ImageGenerationStreamResult {
@@ -19,11 +19,11 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const uploadBufferToCloudinary = (buffer: Buffer, fileName: string, folder: string): Promise<string> => {
+const uploadBufferToCloudinary = (buffer: Buffer, fileName: string, cloudinaryAssetFolder: string): Promise<string> => {
     return new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
             {
-                folder,
+                folder: cloudinaryAssetFolder,
                 public_id: fileName,
             },
             (error, result) => {
@@ -39,7 +39,11 @@ const uploadBufferToCloudinary = (buffer: Buffer, fileName: string, folder: stri
     });
 };
 
-export const generateAndUploadStream = async (datFileBuffer: Buffer, datFileName: string): Promise<ImageGenerationStreamResult> => {
+export const generateAndUploadStream = async (
+    datFileBuffer: Buffer,
+    datFileName: string,
+    cloudinaryAssetFolder: string
+): Promise<ImageGenerationStreamResult> => {
     const fileDirectoryName = path.basename(datFileName, path.extname(datFileName));
     const generatedScreenshotFileName = `${fileDirectoryName}_screenshot_render`;
     const generatedThumbnailFileName = `${fileDirectoryName}_thumbnail_render`;
@@ -53,10 +57,10 @@ export const generateAndUploadStream = async (datFileBuffer: Buffer, datFileName
     // Upload PNG screenshot and Thumbnail image concurrently
     const [screenshotUrl, thumbnailUrl] = await Promise.all([
         pngResult.imageCreated
-            ? uploadBufferToCloudinary(pngResult.imageBuffer!, generatedScreenshotFileName, process.env.CATALOG_NAME as string)
+            ? uploadBufferToCloudinary(pngResult.imageBuffer!, generatedScreenshotFileName, cloudinaryAssetFolder || 'manic-assets')
             : Promise.resolve(''),
         thumbnailResult.imageCreated
-            ? uploadBufferToCloudinary(thumbnailResult.imageBuffer!, generatedThumbnailFileName, process.env.CATALOG_NAME as string)
+            ? uploadBufferToCloudinary(thumbnailResult.imageBuffer!, generatedThumbnailFileName, cloudinaryAssetFolder || 'manic-assets')
             : Promise.resolve(''),
     ]);
 

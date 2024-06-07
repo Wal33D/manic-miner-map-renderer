@@ -47,10 +47,10 @@ cloudinary_1.v2.config({
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-const uploadBufferToCloudinary = (buffer, fileName, folder) => {
+const uploadBufferToCloudinary = (buffer, fileName, cloudinaryAssetFolder) => {
     return new Promise((resolve, reject) => {
         const uploadStream = cloudinary_1.v2.uploader.upload_stream({
-            folder,
+            folder: cloudinaryAssetFolder,
             public_id: fileName,
         }, (error, result) => {
             if (error) {
@@ -63,7 +63,7 @@ const uploadBufferToCloudinary = (buffer, fileName, folder) => {
         uploadStream.end(buffer);
     });
 };
-const generateAndUploadStream = (datFileBuffer, datFileName) => __awaiter(void 0, void 0, void 0, function* () {
+const generateAndUploadStream = (datFileBuffer, datFileName, cloudinaryAssetFolder) => __awaiter(void 0, void 0, void 0, function* () {
     const fileDirectoryName = path_1.default.basename(datFileName, path_1.default.extname(datFileName));
     const generatedScreenshotFileName = `${fileDirectoryName}_screenshot_render`;
     const generatedThumbnailFileName = `${fileDirectoryName}_thumbnail_render`;
@@ -75,10 +75,10 @@ const generateAndUploadStream = (datFileBuffer, datFileName) => __awaiter(void 0
     // Upload PNG screenshot and Thumbnail image concurrently
     const [screenshotUrl, thumbnailUrl] = yield Promise.all([
         pngResult.imageCreated
-            ? uploadBufferToCloudinary(pngResult.imageBuffer, generatedScreenshotFileName, process.env.CATALOG_NAME)
+            ? uploadBufferToCloudinary(pngResult.imageBuffer, generatedScreenshotFileName, cloudinaryAssetFolder || 'manic-assets')
             : Promise.resolve(''),
         thumbnailResult.imageCreated
-            ? uploadBufferToCloudinary(thumbnailResult.imageBuffer, generatedThumbnailFileName, process.env.CATALOG_NAME)
+            ? uploadBufferToCloudinary(thumbnailResult.imageBuffer, generatedThumbnailFileName, cloudinaryAssetFolder || 'manic-assets')
             : Promise.resolve(''),
     ]);
     return {
